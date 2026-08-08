@@ -1,0 +1,236 @@
+import os
+import sys
+import json
+import time
+import pandas as pd
+import streamlit as st
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from data.internship_store import internship_store
+
+# ── STREAMLIT PAGE CONFIG ────────────────────────────────
+st.set_page_config(
+    page_title="EduAdapt AI — Multimodal Learning Platform",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom Styling
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+    .sub-header {
+        color: #4b5563;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    .card-box {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.2rem;
+    }
+    .metric-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ── SIDEBAR DOCK NAVIGATION ──────────────────────────────
+st.sidebar.image("https://img.icons8.com/duotone/96/4f46e5/education.png", width=60)
+st.sidebar.title("EduAdapt AI")
+st.sidebar.markdown("**Multimodal Student Learning Platform**")
+
+role = st.sidebar.radio(
+    "🔑 Select Dashboard Portal:",
+    ["🎓 Student Portal", "👨‍🏫 Teacher Portal", "🏛️ HOD Portal", "💼 Live Internship Opportunities", "🔍 AI Gap Analyzer"]
+)
+
+st.sidebar.markdown("---")
+st.sidebar.info("💡 **Local Network Sync Active:** All internship postings are synchronized in real-time across HOD, Teacher, and Student logins.")
+
+# ── 1. STUDENT PORTAL ────────────────────────────────────
+if role == "🎓 Student Portal":
+    st.markdown('<div class="main-header">🎓 Student Academic Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Welcome back, <strong>Alex Rivera</strong> (TY Computer Science)</div>', unsafe_allow_html=True)
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Latest CGPA", "9.1", "+0.2 Sem-on-Sem")
+    with col2:
+        st.metric("AI Mastery Index", "88%", "+5% Growth")
+    with col3:
+        st.metric("Attendance", "88%", "Good Standing")
+    with col4:
+        st.metric("Assignments Done", "92%", "11/12 Completed")
+
+    st.markdown("### 📈 Concept Mastery Breakdown")
+    concept_data = pd.DataFrame({
+        "Concept": ["Algebra & Equations", "Linear System Solver", "Derivatives", "Partial Derivatives", "Optimization & Gradient Descent"],
+        "Mastery Score (%)": [85, 70, 40, 25, 20]
+    })
+    st.bar_chart(concept_data.set_index("Concept"))
+
+    st.markdown("### 🎓 Recommended Internship Opportunities")
+    internships = internship_store.get_all()
+    if internships:
+        for item in internships[:2]:
+            with st.expander(f"💼 {item['title']} — {item['company']} ({item['stipend']})", expanded=True):
+                st.write(f"**Location:** {item.get('location', 'Remote')} | **Deadline:** {item.get('deadline', 'Open')}")
+                st.write(item.get('description', ''))
+                st.write(f"*Posted by: {item.get('posted_by', 'Faculty')}*")
+                st.link_button("🚀 Apply Now", item.get('apply_url', '#'))
+    else:
+        st.info("No active internships currently posted.")
+
+# ── 2. TEACHER PORTAL ────────────────────────────────────
+elif role == "👨‍🏫 Teacher Portal":
+    st.markdown('<div class="main-header">👨‍🏫 Teacher Management Portal</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Logged in as: <strong>Prof. AIML Teacher</strong></div>', unsafe_allow_html=True)
+
+    tab1, tab2 = st.tabs(["👥 Student Roster & Performance", "📢 Post Internship Opportunity"])
+
+    with tab1:
+        st.markdown("### Student Class Roster")
+        students_df = pd.DataFrame([
+            {"Name": "Alex Rivera", "PRN": "PRN2021001", "Year": "TY-A", "CGPA": 9.1, "Attendance": "88%", "Status": "Active"},
+            {"Name": "Priya Sharma", "PRN": "PRN2021002", "Year": "TY-A", "CGPA": 9.5, "Attendance": "96%", "Status": "Top Ranker"},
+            {"Name": "Rahul Desai", "PRN": "PRN2021003", "Year": "SY-B", "CGPA": 6.4, "Attendance": "71%", "Status": "⚠️ Needs Review"}
+        ])
+        st.dataframe(students_df, use_container_width=True)
+
+    with tab2:
+        st.markdown("### Broadcast Internship Opportunity")
+        with st.form("teacher_internship_form"):
+            t_title = st.text_input("Internship Title *", placeholder="e.g. AI Research Intern")
+            t_company = st.text_input("Company Name *", placeholder="e.g. EduAdapt Research")
+            t_location = st.text_input("Location", value="Remote / Pune")
+            t_stipend = st.text_input("Stipend", value="₹20,000 / month")
+            t_url = st.text_input("Application URL / Contact Email *", placeholder="https://careers.example.com")
+            t_desc = st.text_area("Role Description *", placeholder="Describe prerequisites and responsibilities...")
+            
+            submitted = st.form_submit_button("🚀 Broadcast Internship")
+            if submitted:
+                if t_title and t_company and t_url and t_desc:
+                    internship_store.create({
+                        "title": t_title,
+                        "company": t_company,
+                        "location": t_location,
+                        "stipend": t_stipend,
+                        "apply_url": t_url,
+                        "description": t_desc,
+                        "posted_by": "Prof. AIML Teacher (Faculty)"
+                    })
+                    st.success("✅ Internship posted successfully and synced across network!")
+                else:
+                    st.error("Please fill in all required fields.")
+
+# ── 3. HOD PORTAL ────────────────────────────────────────
+elif role == "🏛️ HOD Portal":
+    st.markdown('<div class="main-header">🏛️ Department Head (HOD) Portal</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Department of AI & Machine Learning</div>', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Students Enrolled", "148", "6 Divisions")
+    with col2:
+        st.metric("Active Faculty Members", "12", "All Positions Filled")
+    with col3:
+        st.metric("Average Dept CGPA", "8.2", "+0.4 Year-over-Year")
+
+    st.markdown("### 🏛️ Broadcast HOD Internship / Research Fellowship")
+    with st.form("hod_internship_form"):
+        h_title = st.text_input("Internship Title *", placeholder="e.g. Google DeepMind AI Scholar")
+        h_company = st.text_input("Company / Institution *", placeholder="e.g. Google DeepMind")
+        h_location = st.text_input("Location", value="Bangalore / Remote")
+        h_stipend = st.text_input("Stipend", value="₹35,000 / month")
+        h_url = st.text_input("Application URL *", placeholder="https://careers.google.com")
+        h_desc = st.text_area("Description & Prerequisites *")
+        
+        hod_submitted = st.form_submit_button("🏛️ Publish Department Internship")
+        if hod_submitted:
+            if h_title and h_company and h_url and h_desc:
+                internship_store.create({
+                    "title": h_title,
+                    "company": h_company,
+                    "location": h_location,
+                    "stipend": h_stipend,
+                    "apply_url": h_url,
+                    "description": h_desc,
+                    "posted_by": "Dr. Rajesh Sharma (HOD)"
+                })
+                st.success("🎉 HOD Internship broadcasted to all students!")
+            else:
+                st.error("Please fill in required fields.")
+
+# ── 4. LIVE INTERNSHIP OPPORTUNITIES ─────────────────────
+elif role == "💼 Live Internship Opportunities":
+    st.markdown('<div class="main-header">💼 Live Internship Opportunities Board</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Real-time synchronized opportunities from HOD & Faculty</div>', unsafe_allow_html=True)
+
+    internships = internship_store.get_all()
+    if not internships:
+        st.warning("No internships posted yet. HOD or Teachers can post from their portal.")
+    else:
+        for idx, item in enumerate(internships):
+            st.subheader(f"💼 {item['title']}")
+            st.caption(f"🏢 **{item['company']}** | 📍 {item.get('location')} | 💰 {item.get('stipend')} | 📅 Deadline: {item.get('deadline', 'Open')}")
+            st.write(item.get('description', ''))
+            
+            c1, c2 = st.columns([1, 4])
+            with c1:
+                st.link_button("🚀 Apply Now", item.get('apply_url', '#'))
+            with c2:
+                if st.button(f"🗑️ Delete Posting", key=f"del_{item['id']}"):
+                    internship_store.delete(item['id'])
+                    st.rerun()
+            st.divider()
+
+# ── 5. AI GAP ANALYZER ───────────────────────────────────
+elif role == "🔍 AI Gap Analyzer":
+    st.markdown('<div class="main-header">🔍 Multimodal Diagnostic Gap Analyzer</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Simulate student concept performance & inspect AI diagnosis</div>', unsafe_allow_html=True)
+
+    st.markdown("#### Adjust Concept Mastery Sliders:")
+    alg = st.slider("Algebra & Equations", 0, 100, 85)
+    lin = st.slider("Linear System Solver", 0, 100, 70)
+    der = st.slider("Derivatives", 0, 100, 40)
+    pder = st.slider("Partial Derivatives", 0, 100, 25)
+    opt = st.slider("Optimization & Gradient Descent", 0, 100, 20)
+
+    if st.button("🧠 Run Multimodal AI Diagnosis"):
+        st.markdown("---")
+        st.markdown("### 📊 AI Diagnosis Result")
+        
+        gaps = []
+        if pder < 50:
+            gaps.append("⚠️ **Partial Derivatives:** Foundational prerequisite gap detected before Optimization.")
+        if opt < 50:
+            gaps.append("⚠️ **Optimization & Gradient Descent:** Conceptual gap in applying partial derivatives to cost function minimization.")
+
+        if gaps:
+            st.error("#### Identified Root Learning Gaps:")
+            for g in gaps:
+                st.write(g)
+            
+            st.info("#### Recommended Learning Interventions:")
+            st.write("1. 📹 **Interactive Visual Module:** Watch 3D Gradient Surface Visualization.")
+            st.write("2. 📝 **Targeted Quiz:** Complete 5 adaptive questions on Partial Derivative chain rules.")
+        else:
+            st.success("🎉 Excellent! All concept mastery levels are strong!")

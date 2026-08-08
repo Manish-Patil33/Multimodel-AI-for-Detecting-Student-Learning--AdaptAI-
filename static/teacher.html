@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduAdapt — Teacher Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">📊</div> EduAdapt AI</div>
+    <nav>
+      <button class="nav-link active" onclick="showPage('students')"><span class="nav-icon">👥</span> My Students</button>
+      <button class="nav-link" onclick="showPage('analytics')"><span class="nav-icon">📊</span> Quiz Analytics & Topic Pie Charts</button>
+      <button class="nav-link" onclick="showPage('qa')"><span class="nav-icon">💬</span> Student Q & A Hub</button>
+      <button class="nav-link" onclick="showPage('marks')"><span class="nav-icon">📝</span> Enter Marks</button>
+      <button class="nav-link" onclick="showPage('quizzes')"><span class="nav-icon">❓</span> Create Quiz</button>
+      <button class="nav-link" onclick="showPage('results')"><span class="nav-icon">📈</span> Quiz Results</button>
+      <button class="nav-link" onclick="showPage('internships')"><span class="nav-icon">💼</span> Share Internships</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="t-avatar">T</div>
+        <div class="user-info">
+          <div class="user-name" id="t-name">Teacher</div>
+          <div class="user-role">Teacher</div>
+        </div>
+      </div>
+      <button type="button" class="btn-logout-full" onclick="EA.logout()">
+        🚪 Return to Login / Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ STUDENTS ══ -->
+    <div id="page-students" class="page active">
+      <div class="page-header flex-between">
+        <div>
+          <h1>My Students Roster</h1>
+          <p>Click any student to view their full academic report, CGPA history, and profile.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="flex gap-8 mb-20" style="align-items:center">
+        <input id="stu-search" class="search-input" placeholder="Search by name or PRN…" oninput="renderStudentList()">
+        <select id="stu-filter-year" onchange="renderStudentList()" style="padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px">
+          <option value="">All Years</option>
+          <option value="FY">FY</option><option value="SY">SY</option><option value="TY">TY</option>
+        </select>
+        <select id="stu-filter-div" onchange="renderStudentList()" style="padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px">
+          <option value="">All Divisions</option>
+          <option value="A">Division A</option><option value="B">Division B</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <!-- Student list -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div id="student-list"></div>
+        </div>
+
+        <!-- Student detail panel -->
+        <div id="student-detail-panel">
+          <div class="card" style="text-align:center;padding:60px">
+            <div style="font-size:48px;margin-bottom:12px">👆</div>
+            <p class="text-muted">Select a student from the list to view their full report.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ OVERALL QUIZ ANALYTICS & TOPIC PIE CHARTS ══ -->
+    <div id="page-analytics" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Overall Student Quiz Analytics</h1>
+          <p>Overall reports based on quiz data with topic unit pie charts identifying where students struggle.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="grid-4 mb-20" id="teacher-analytics-stats"></div>
+
+      <div class="grid-2 mb-20">
+        <!-- Pie Chart 1: Topic Mastery Distribution -->
+        <div class="card">
+          <div class="card-title">🥧 Unit Topic Proficiency Breakdown</div>
+          <div style="height:260px;display:flex;justify-content:center"><canvas id="chart-topic-pie"></canvas></div>
+        </div>
+
+        <!-- Pie Chart 2: Cohort Performance Status -->
+        <div class="card">
+          <div class="card-title">📊 Overall Class Quiz Performance Categories</div>
+          <div style="height:260px;display:flex;justify-content:center"><canvas id="chart-performance-pie"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚠️ Weak Topics Requiring Immediate Faculty Intervention</div>
+        <p class="text-muted" style="font-size:13px;margin-bottom:14px">Topics where multiple students scored low on quizzes, showing exact student gap counts:</p>
+        <div id="teacher-weak-topics-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ STUDENT Q & A HUB ══ -->
+    <div id="page-qa" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Student Q & A Hub</h1>
+          <p>Review student doubts and provide answers on difficult concepts.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💬 Pending & Answered Student Doubts</div>
+        <div id="teacher-qa-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ ENTER MARKS ══ -->
+    <div id="page-marks" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Enter Student Marks</h1>
+          <p>Update CGPA, assignments, unit tests, and attendance.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+      <div class="card mb-20">
+        <div class="card-title">Select Student</div>
+        <select id="marks-student-sel" onchange="loadMarksForm()" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:inherit">
+          <option value="">— Choose student —</option>
+        </select>
+      </div>
+      <div id="marks-form-area"></div>
+    </div>
+
+    <!-- ══ CREATE QUIZ ══ -->
+    <div id="page-quizzes" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Create a Quiz</h1>
+          <p>Questions are shown to students but answers are hidden until they submit.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Quiz Details</div>
+          <div class="field-sm"><label>Quiz Title</label><input id="qz-title" placeholder="e.g. Unit Test 1 — Machine Learning"></div>
+          <div class="field-sm"><label>Subject</label><input id="qz-subject" placeholder="e.g. Machine Learning"></div>
+          <div class="field-row" style="gap:12px;display:grid;grid-template-columns:1fr 1fr">
+            <div class="field-sm"><label>Target Year</label>
+              <select id="qz-year"><option value="">All</option><option value="FY">FY</option><option value="SY">SY</option><option value="TY">TY</option></select>
+            </div>
+            <div class="field-sm"><label>Division</label>
+              <select id="qz-div"><option value="">All</option><option value="A">A</option><option value="B">B</option></select>
+            </div>
+          </div>
+          <div class="field-sm"><label>Due Date</label><input id="qz-due" type="date"></div>
+
+          <!-- AI Proctoring Settings -->
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:10px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:13px;color:#1e1b4b;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+              📹 AI Malpractice & Proctoring Protection
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:10px">
+              <input type="checkbox" id="qz-proctored" checked style="width:16px;height:16px;accent-color:#6366f1">
+              <span>Enable AI Webcam, Screen Share & Anti-Malpractice Monitoring</span>
+            </label>
+            <div class="field-sm" style="margin-bottom:0">
+              <label>Max Allowed Malpractice Violations (Auto-submit threshold)</label>
+              <input id="qz-max-violations" type="number" min="1" max="10" value="3" placeholder="3">
+            </div>
+          </div>
+
+          <div class="card-title" style="margin-top:20px">Questions</div>
+          <div id="questions-list"></div>
+          <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addQuestion()">+ Add Question</button>
+
+          <button class="btn btn-indigo btn-full" style="margin-top:20px" onclick="saveQuiz()">Publish Quiz</button>
+          <div id="qz-msg" class="hidden" style="margin-top:10px;padding:10px;background:#ecfdf5;border-radius:8px;color:#065f46;font-size:13px">✓ Quiz published successfully!</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Published Quizzes</div>
+          <div id="published-quiz-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ QUIZ RESULTS ══ -->
+    <div id="page-results" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Individual Quiz Results</h1>
+          <p>See how each student performed on your quizzes.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+      <div class="card mb-20">
+        <div class="card-title">Select Quiz</div>
+        <select id="results-quiz-sel" onchange="loadQuizResults()" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:inherit">
+          <option value="">— Choose quiz —</option>
+        </select>
+      </div>
+      <div id="results-area"></div>
+    </div>
+
+    <!-- ══ SHARE INTERNSHIPS ══ -->
+    <div id="page-internships" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>💼 Share & Manage Internship Opportunities</h1>
+          <p>Post industry internships and research opportunities to your students.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="grid-2">
+        <!-- Post Internship Form -->
+        <div class="card">
+          <div class="card-title">📢 Post New Internship Opportunity</div>
+          <form onsubmit="handleTeacherPostInternship(event)">
+            <div class="field-sm">
+              <label>Internship Title *</label>
+              <input id="ti-title" placeholder="e.g. AI & Machine Learning Research Intern" required>
+            </div>
+            <div class="field-sm">
+              <label>Company / Organization Name *</label>
+              <input id="ti-company" placeholder="e.g. TechVision Labs" required>
+            </div>
+            <div class="field-row">
+              <div class="field-sm">
+                <label>Location</label>
+                <input id="ti-location" placeholder="e.g. Remote / Hybrid / Pune">
+              </div>
+              <div class="field-sm">
+                <label>Stipend Amount</label>
+                <input id="ti-stipend" placeholder="e.g. ₹20,000 / month">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-sm">
+                <label>Target Year</label>
+                <select id="ti-year">
+                  <option value="All Years">All Years</option>
+                  <option value="FY">FY</option>
+                  <option value="SY">SY</option>
+                  <option value="TY">TY</option>
+                </select>
+              </div>
+              <div class="field-sm">
+                <label>Application Deadline</label>
+                <input id="ti-deadline" type="date">
+              </div>
+            </div>
+            <div class="field-sm">
+              <label>Application URL or Contact Email *</label>
+              <input id="ti-url" placeholder="https://careers.company.com/apply or email" required>
+            </div>
+            <div class="field-sm">
+              <label>Internship Role Description & Requirements *</label>
+              <textarea id="ti-desc" rows="4" placeholder="Describe key responsibilities, prerequisites, and skills required..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-indigo btn-full">🚀 Broadcast Internship to Students</button>
+            <div id="ti-msg" class="hidden" style="margin-top:10px;padding:10px;background:#ecfdf5;border-radius:8px;color:#065f46;font-size:13px">✓ Internship posted successfully!</div>
+          </form>
+        </div>
+
+        <!-- Posted Internships List -->
+        <div class="card">
+          <div class="card-title">📋 Active Department Internships</div>
+          <div id="teacher-internships-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/static/data.js"></script>
+<script src="/static/teacher.js"></script>
+<script src="/static/dock-sidebar.js"></script>
+</body>
+</html>

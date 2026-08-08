@@ -1,0 +1,32 @@
+student_model:
+  hidden_size: 128
+  learning_rate: 0.01
+  forgetting_rate: 0.02
+  knowledge_decay: 0.01
+
+content:
+  max_features: 1000
+  relevance_weight: 0.5
+  style_match_weight: 0.3
+  difficulty_weight: 0.1
+  duration_weight: 0.1
+
+optimization:
+  learning_rate: 0.001
+  gamma: 0.99
+  hidden_size: 128
+  exploration_rate: 0.1
+
+students:
+  default_learning_style: "visual"
+  simulated_students_count: 50
+
+assessment:
+  adaptive_difficulty: true
+  pass_threshold: 0.7
+  mastery_threshold: 0.8
+  questions_per_quiz: 5
+
+progress:
+  retention_period_days: 30
+  velocity_window_hours: 1.0

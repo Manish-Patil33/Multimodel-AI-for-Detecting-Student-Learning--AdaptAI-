@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduAdapt AI — Multimodal Learning Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-split">
+  <!-- LEFT BRANDING & VALUE PROP -->
+  <div class="auth-left">
+    <div class="brand-badge">
+      <span class="pulse-dot"></span> EduAdapt Multimodal AI 2.0
+    </div>
+
+    <h1 class="hero-title">Multimodal Learning Gap Detection Platform</h1>
+    <p class="hero-desc">Analyzing student performance, telemetry, doubt questions & assessment patterns to diagnose root conceptual gaps and deliver personalized learning interventions.</p>
+
+    <div class="auth-feature-grid">
+      <div class="auth-feature-card">
+        <div class="af-icon">📊</div>
+        <div>
+          <h4>Performance Vector Tracking</h4>
+          <p>Maps conceptual mastery across multi-semester academic history.</p>
+        </div>
+      </div>
+
+      <div class="auth-feature-card">
+        <div class="af-icon">🧠</div>
+        <div>
+          <h4>Behavior & Telemetry Fusion</h4>
+          <p>Tracks focus indices, attention spans, and learning pace types.</p>
+        </div>
+      </div>
+
+      <div class="auth-feature-card">
+        <div class="af-icon">💬</div>
+        <div>
+          <h4>NLP Doubt Resolution</h4>
+          <p>Extracts latent prerequisite gaps directly from natural text questions.</p>
+        </div>
+      </div>
+
+      <div class="auth-feature-card">
+        <div class="af-icon">🎯</div>
+        <div>
+          <h4>Personalized Interventions</h4>
+          <p>Generates tailored lesson roadmaps aligned with student learning styles.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-account-banner">
+      <div class="dab-title">🚀 Quick Demo Access (1-Click Login)</div>
+      <div class="dab-buttons">
+        <button type="button" class="btn-demo-chip" onclick="quickDemo('aimlhod')">🏛️ AIML HOD (aimlhod)</button>
+        <button type="button" class="btn-demo-chip" onclick="quickDemo('aimlteach')">👨‍🏫 AIML Teacher (aimlteach)</button>
+        <button type="button" class="btn-demo-chip" onclick="quickDemo('student')">🎓 Student</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT AUTH FORM PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+
+      <div class="auth-header">
+        <h2>Portal Sign In</h2>
+        <p>Select your role to access your personalized portal</p>
+      </div>
+
+      <!-- ROLE SELECTOR TABS -->
+      <div class="role-tabs">
+        <button type="button" class="role-tab active" id="rt-student" onclick="setRole('student')">
+          <span class="rt-icon">🎓</span>
+          <span>Student</span>
+        </button>
+        <button type="button" class="role-tab" id="rt-teacher" onclick="setRole('teacher')">
+          <span class="rt-icon">👨‍🏫</span>
+          <span>Teacher</span>
+        </button>
+        <button type="button" class="role-tab" id="rt-hod" onclick="setRole('hod')">
+          <span class="rt-icon">🏛️</span>
+          <span>HOD</span>
+        </button>
+      </div>
+
+      <!-- STUDENT SECTION (Sign In + Sign Up) -->
+      <div id="student-section">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="tab-si" onclick="switchStudentTab('signin')">Sign In</button>
+          <button type="button" class="auth-tab" id="tab-su" onclick="switchStudentTab('signup')">Sign Up (Student)</button>
+        </div>
+
+        <!-- Student Sign In -->
+        <form id="si-form" class="auth-form" onsubmit="doLogin(event, 'student')">
+          <div class="field">
+            <label>Student Email / ID</label>
+            <input id="si-email" type="text" placeholder="e.g. demo@edu.ai" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="si-pass" type="password" placeholder="••••••••" required>
+          </div>
+          <div id="si-err" class="form-error hidden">Incorrect email or password.</div>
+          <button type="submit" class="btn-primary">Sign In to Student Dashboard →</button>
+        </form>
+
+        <!-- Student Sign Up Form -->
+        <form id="su-form" class="auth-form hidden" onsubmit="doRegister(event)">
+          <div class="form-section-title">Personal & Academic Details</div>
+          
+          <div class="field-row">
+            <div class="field"><label>Full Name *</label><input id="su-fn" placeholder="Alex Rivera" required></div>
+            <div class="field"><label>PRN / Roll No. *</label><input id="su-prn" placeholder="PRN2021001" required></div>
+          </div>
+          
+          <div class="field-row">
+            <div class="field"><label>Phone Number *</label><input id="su-phone" placeholder="+91 98765 43210" required></div>
+            <div class="field"><label>Email Address *</label><input id="su-email" type="email" placeholder="alex@example.com" required></div>
+          </div>
+          
+          <div class="field-row">
+            <div class="field"><label>Password *</label><input id="su-pass" type="password" placeholder="Min 6 characters" required minlength="6"></div>
+            <div class="field">
+              <label>Year *</label>
+              <select id="su-year" required>
+                <option value="">Select Year</option>
+                <option value="FY">First Year (FY)</option>
+                <option value="SY">Second Year (SY)</option>
+                <option value="TY">Third Year (TY)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Division *</label>
+              <select id="su-div" required>
+                <option value="">Select Division</option>
+                <option value="A">Division A</option>
+                <option value="B">Division B</option>
+              </select>
+            </div>
+            <div class="field"><label>Department</label><input id="su-dept" value="Computer Science" readonly></div>
+          </div>
+
+          <div class="field"><label>Full Residential Address *</label><input id="su-addr" placeholder="House No, Street, City, PIN Code" required></div>
+
+          <div class="form-section-title">Parent / Guardian Details</div>
+          <div class="field-row">
+            <div class="field"><label>Parent Name *</label><input id="su-pname" placeholder="Carlos Rivera" required></div>
+            <div class="field"><label>Parent Phone *</label><input id="su-pphone" placeholder="+91 98765 43213" required></div>
+          </div>
+          <div class="field"><label>Parent Email</label><input id="su-pemail" type="email" placeholder="parent@example.com"></div>
+
+          <div class="form-section-title">Coding & Social Profiles <span class="optional-tag">(Optional)</span></div>
+          <div class="field-row">
+            <div class="field"><label>LinkedIn</label><input id="su-li" placeholder="linkedin.com/in/username"></div>
+            <div class="field"><label>GitHub</label><input id="su-gh" placeholder="github.com/username"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>LeetCode</label><input id="su-lc" placeholder="leetcode.com/username"></div>
+            <div class="field"><label>HackerRank</label><input id="su-hr" placeholder="hackerrank.com/username"></div>
+          </div>
+
+          <div id="su-err" class="form-error hidden"></div>
+          <button type="submit" class="btn-primary" style="margin-top:12px">Register & Access Dashboard →</button>
+        </form>
+      </div>
+
+      <!-- TEACHER SECTION -->
+      <form id="teacher-section" class="auth-form hidden" onsubmit="doLogin(event, 'teacher')">
+        <div class="field">
+          <label>Faculty Email / Username</label>
+          <input id="ti-email" type="text" placeholder="aimlteach or email@edu.ai" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="ti-pass" type="password" placeholder="••••••••" required>
+        </div>
+        <div id="ti-err" class="form-error hidden">Incorrect teacher credentials.</div>
+        <button type="submit" class="btn-primary">Sign In to Teacher Dashboard →</button>
+        <p class="teacher-notice-text">🔒 Note: New teacher profiles are created exclusively by the Head of Department (HOD).</p>
+      </form>
+
+      <!-- HOD SECTION -->
+      <form id="hod-section" class="auth-form hidden" onsubmit="doLogin(event, 'hod')">
+        <div class="field">
+          <label>HOD Email / Username</label>
+          <input id="hi-email" type="text" placeholder="aimlhod or email@edu.ai" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="hi-pass" type="password" placeholder="••••••••" required>
+        </div>
+        <div id="hi-err" class="form-error hidden">Incorrect HOD credentials.</div>
+        <button type="submit" class="btn-primary">Sign In to HOD Dashboard →</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="/static/data.js"></script>
+<script>
+  EA.seed();
+  const session = EA.getSession();
+  if (session) redirectByRole(session.role);
+
+  function setRole(role) {
+    ['student', 'teacher', 'hod'].forEach(r => {
+      document.getElementById(`rt-${r}`).classList.toggle('active', r === role);
+      const section = document.getElementById(`${r}-section`);
+      if (section) section.classList.toggle('hidden', r !== role);
+    });
+  }
+
+  function switchStudentTab(tab) {
+    document.getElementById('si-form').classList.toggle('hidden', tab !== 'signin');
+    document.getElementById('su-form').classList.toggle('hidden', tab !== 'signup');
+    document.getElementById('tab-si').classList.toggle('active', tab === 'signin');
+    document.getElementById('tab-su').classList.toggle('active', tab === 'signup');
+  }
+
+  function doLogin(e, role) {
+    e.preventDefault();
+    const pfx = { student: 'si', teacher: 'ti', hod: 'hi' }[role];
+    const email = document.getElementById(`${pfx}-email`).value.trim();
+    const pass = document.getElementById(`${pfx}-pass`).value;
+    const user = EA.loginUser(email, pass, role);
+    if (user) {
+      redirectByRole(role);
+    } else {
+      document.getElementById(`${pfx}-err`).classList.remove('hidden');
+    }
+  }
+
+  function doRegister(e) {
+    e.preventDefault();
+    const errEl = document.getElementById('su-err');
+    const user = {
+      role: 'student',
+      name: document.getElementById('su-fn').value.trim(),
+      email: document.getElementById('su-email').value.trim(),
+      password: document.getElementById('su-pass').value,
+      prn: document.getElementById('su-prn').value.trim(),
+      phone: document.getElementById('su-phone').value.trim(),
+      year: document.getElementById('su-year').value,
+      division: document.getElementById('su-div').value,
+      department: document.getElementById('su-dept').value,
+      address: document.getElementById('su-addr').value.trim(),
+      parentName: document.getElementById('su-pname').value.trim(),
+      parentPhone: document.getElementById('su-pphone').value.trim(),
+      parentEmail: document.getElementById('su-pemail').value.trim(),
+      linkedin: document.getElementById('su-li').value.trim(),
+      github: document.getElementById('su-gh').value.trim(),
+      leetcode: document.getElementById('su-lc').value.trim(),
+      hackerrank: document.getElementById('su-hr').value.trim(),
+    };
+    const result = EA.registerUser(user);
+    if (!result.ok) {
+      errEl.textContent = result.msg;
+      errEl.classList.remove('hidden');
+      return;
+    }
+    EA.setSession(result.user);
+    redirectByRole('student');
+  }
+
+  function quickDemo(role) {
+    const creds = {
+      student: ['demo@edu.ai', 'demo123', 'student'],
+      teacher: ['teacher@edu.ai', 'teacher123', 'teacher'],
+      hod: ['hod@edu.ai', 'hod123', 'hod'],
+      aimlhod: ['aimlhod', 'Pass', 'hod'],
+      aimlteach: ['aimlteach', 'Pass', 'teacher']
+    };
+    const [email, pass, userRole] = creds[role];
+    setRole(userRole);
+    const user = EA.loginUser(email, pass, userRole);
+    if (user) redirectByRole(userRole);
+  }
+
+  function redirectByRole(role) {
+    const paths = { student: '/static/dashboard.html', teacher: '/static/teacher.html', hod: '/static/hod.html' };
+    window.location.href = paths[role] || '/';
+  }
+</script>
+</body>
+</html>

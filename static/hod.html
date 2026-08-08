@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduAdapt — HOD Department Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">📊</div> EduAdapt AI</div>
+    <nav>
+      <button class="nav-link active" onclick="showPage('overview')"><span class="nav-icon">🏛️</span> Department Overview</button>
+      <button class="nav-link" onclick="showPage('leaderboard')"><span class="nav-icon">🏆</span> Top Student Leaderboard</button>
+      <button class="nav-link" onclick="showPage('subj-analytics')"><span class="nav-icon">📚</span> Subject Analytics & Pie Charts</button>
+      <button class="nav-link" onclick="showPage('classes')"><span class="nav-icon">🏫</span> Classes</button>
+      <button class="nav-link" onclick="showPage('subjects')"><span class="nav-icon">📖</span> Subjects</button>
+      <button class="nav-link" onclick="showPage('students')"><span class="nav-icon">👥</span> All Students</button>
+      <button class="nav-link" onclick="showPage('faculty')"><span class="nav-icon">👨‍🏫</span> Faculty & Teachers</button>
+      <button class="nav-link" onclick="showPage('internships')"><span class="nav-icon">💼</span> Department Internships</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="hod-avatar">H</div>
+        <div class="user-info">
+          <div class="user-name" id="hod-name">HOD</div>
+          <div class="user-role">Head of Department</div>
+        </div>
+      </div>
+      <button type="button" class="btn-logout-full" onclick="EA.logout()">
+        🚪 Return to Login / Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <div id="page-overview" class="page active">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Department Overview</h1>
+          <p id="hod-dept-label">Computer Science Department</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+      <div class="grid-4 mb-20" id="hod-stats"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📊 Class-wise Performance (Avg CGPA)</div>
+          <div id="class-cgpa-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ At-Risk Students (Attendance &lt; 75% or Low CGPA)</div>
+          <div id="at-risk-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TOP STUDENT LEADERBOARD & RANKINGS ══ -->
+    <div id="page-leaderboard" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Department Student Leaderboard & Rankings</h1>
+          <p>Ranked top performers based on CGPA, quiz scores, attendance, and overall AI Index.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="flex gap-8 mb-20" style="align-items:center">
+        <select id="rank-filter-year" onchange="renderLeaderboard()" style="padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px">
+          <option value="">All Academic Years</option>
+          <option value="FY">FY</option><option value="SY">SY</option><option value="TY">TY</option>
+        </select>
+        <select id="rank-filter-div" onchange="renderLeaderboard()" style="padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px">
+          <option value="">All Divisions</option>
+          <option value="A">Division A</option><option value="B">Division B</option>
+        </select>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="data-table" style="width:100%">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Student Name</th>
+              <th>PRN</th>
+              <th>Year / Div</th>
+              <th>Average CGPA</th>
+              <th>Quiz Accuracy</th>
+              <th>Attendance</th>
+              <th>AI Score Index</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ SUBJECT ANALYTICS & PIE CHARTS ══ -->
+    <div id="page-subj-analytics" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Department Subject Analytics</h1>
+          <p>Subject and unit topic performance breakdown across all classes.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="grid-2 mb-20">
+        <!-- Subject Pie Chart 1 -->
+        <div class="card">
+          <div class="card-title">🥧 Subject Pass & Proficiency Distribution</div>
+          <div style="height:260px;display:flex;justify-content:center"><canvas id="chart-hod-subject-pie"></canvas></div>
+        </div>
+
+        <!-- Subject Pie Chart 2 -->
+        <div class="card">
+          <div class="card-title">📊 Division Mastery Comparison</div>
+          <div style="height:260px;display:flex;justify-content:center"><canvas id="chart-hod-div-pie"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLASSES -->
+    <div id="page-classes" class="page">
+      <div class="page-header"><h1>Classes & Divisions</h1><p>Monitor performance by year and division.</p></div>
+      <div id="classes-grid" class="grid-3"></div>
+      <div id="class-detail" style="margin-top:24px"></div>
+    </div>
+
+    <!-- SUBJECTS -->
+    <div id="page-subjects" class="page">
+      <div class="page-header"><h1>Department Subjects</h1><p>Curriculum breakdown with assigned faculty members.</p></div>
+      <div id="subjects-content"></div>
+    </div>
+
+    <!-- ALL STUDENTS -->
+    <div id="page-students" class="page">
+      <div class="page-header"><h1>Department Student Roster</h1><p>Complete record of all enrolled students.</p></div>
+      <div class="flex gap-8 mb-20" style="align-items:center">
+        <input id="hod-search" class="search-input" placeholder="Search by name or PRN…" oninput="renderHodStudents()">
+        <select id="hod-yr" onchange="renderHodStudents()" style="padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px">
+          <option value="">All Years</option><option value="FY">FY</option><option value="SY">SY</option><option value="TY">TY</option>
+        </select>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="data-table" id="hod-student-table" style="width:100%">
+          <thead><tr><th>Name</th><th>PRN</th><th>Year/Div</th><th>Avg CGPA</th><th>Attendance</th><th>Assignments</th><th>Action</th></tr></thead>
+          <tbody id="hod-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FACULTY & TEACHERS -->
+    <div id="page-faculty" class="page">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h1>Department Faculty</h1>
+          <p>Manage teaching staff and assign subject responsibilities.</p>
+        </div>
+        <button class="btn btn-indigo" onclick="openCreateTeacherModal()">+ Create New Teacher Profile</button>
+      </div>
+      <div id="faculty-grid" class="grid-3"></div>
+    </div>
+
+    <!-- ══ DEPARTMENT INTERNSHIPS (HOD) ══ -->
+    <div id="page-internships" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>💼 Department Internship Portal & Opportunities</h1>
+          <p>Broadcast high-impact industry and research internships to all department students.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
+      </div>
+
+      <div class="grid-2">
+        <!-- HOD Post Internship Form -->
+        <div class="card">
+          <div class="card-title">🏛️ Broadcast HOD Internship Opportunity</div>
+          <form onsubmit="handleHodPostInternship(event)">
+            <div class="field-sm">
+              <label>Internship Title *</label>
+              <input id="hi-title" placeholder="e.g. Google DeepMind AI Research Intern" required>
+            </div>
+            <div class="field-sm">
+              <label>Company / Organization Name *</label>
+              <input id="hi-company" placeholder="e.g. Google DeepMind / Microsoft Research" required>
+            </div>
+            <div class="field-row">
+              <div class="field-sm">
+                <label>Location</label>
+                <input id="hi-location" placeholder="e.g. Remote / Bangalore / Hybrid">
+              </div>
+              <div class="field-sm">
+                <label>Stipend Amount</label>
+                <input id="hi-stipend" placeholder="e.g. ₹35,000 / month">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-sm">
+                <label>Target Year</label>
+                <select id="hi-year">
+                  <option value="All Years">All Years</option>
+                  <option value="FY">FY</option>
+                  <option value="SY">SY</option>
+                  <option value="TY">TY</option>
+                </select>
+              </div>
+              <div class="field-sm">
+                <label>Application Deadline</label>
+                <input id="hi-deadline" type="date">
+              </div>
+            </div>
+            <div class="field-sm">
+              <label>Application URL or Contact Email *</label>
+              <input id="hi-url" placeholder="https://careers.company.com/apply" required>
+            </div>
+            <div class="field-sm">
+              <label>Internship Description & Key Skills *</label>
+              <textarea id="hi-desc" rows="4" placeholder="Describe the internship scope, prerequisites, stipend details..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-indigo btn-full">🏛️ Broadcast HOD Internship Opportunity</button>
+            <div id="hi-msg" class="hidden" style="margin-top:10px;padding:10px;background:#ecfdf5;border-radius:8px;color:#065f46;font-size:13px">✓ HOD Internship posted and synced to all students!</div>
+          </form>
+        </div>
+
+        <!-- HOD Active Internships List -->
+        <div class="card">
+          <div class="card-title">📋 Live Department Internships</div>
+          <div id="hod-internships-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- STUDENT FULL REPORT MODAL -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="font-size:18px;font-weight:700">Student Comprehensive Report</h3>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#6b7280">✕</button>
+    </div>
+    <div id="modal-content" style="overflow-y:auto;max-height:70vh"></div>
+  </div>
+</div>
+
+<!-- CREATE TEACHER MODAL (HOD ONLY) -->
+<div id="teacher-modal-overlay" class="modal-overlay hidden" onclick="closeTeacherModal()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:560px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="font-size:18px;font-weight:700">👨‍🏫 Create New Teacher Account</h3>
+      <button onclick="closeTeacherModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#6b7280">✕</button>
+    </div>
+
+    <form onsubmit="handleCreateTeacher(event)">
+      <div class="field-row">
+        <div class="field-sm"><label>Full Name *</label><input id="nt-name" placeholder="Prof. Sangeeta Verma" required></div>
+        <div class="field-sm"><label>Employee ID *</label><input id="nt-emp" placeholder="EMP-CS-104" required></div>
+      </div>
+      
+      <div class="field-row">
+        <div class="field-sm"><label>Email Address *</label><input id="nt-email" type="email" placeholder="sangeeta@edu.ai" required></div>
+        <div class="field-sm"><label>Default Password *</label><input id="nt-pass" type="password" placeholder="••••••••" required minlength="6"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-sm"><label>Phone Number</label><input id="nt-phone" placeholder="+91 98765 43240"></div>
+        <div class="field-sm"><label>Department</label><input id="nt-dept" value="Computer Science" readonly></div>
+      </div>
+
+      <div class="field-sm">
+        <label>Assigned Subjects (comma-separated)</label>
+        <input id="nt-subjects" placeholder="e.g. Deep Learning, Data Structures & Algorithms">
+      </div>
+
+      <div id="nt-err" class="form-error hidden" style="margin-top:10px"></div>
+      <div id="nt-success" style="margin-top:10px;padding:10px;background:#ecfdf5;border-radius:8px;color:#065f46;font-size:13px" class="hidden">✓ Teacher profile created successfully!</div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="btn btn-outline" onclick="closeTeacherModal()">Cancel</button>
+        <button type="submit" class="btn btn-indigo">Create Teacher Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/static/data.js"></script>
+<script src="/static/hod.js"></script>
+<script src="/static/dock-sidebar.js"></script>
+</body>
+</html>
